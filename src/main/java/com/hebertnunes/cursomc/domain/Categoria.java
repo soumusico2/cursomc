@@ -22,6 +22,10 @@ public class Categoria implements Serializable{
 		this.nome = nome;
 	}
 	
+	public Categoria() {
+		super();
+	}
+
 	public int getId() {
 		return id;
 	}
