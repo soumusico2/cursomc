@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import com.hebertnunes.cursomc.domain.Categoria;
+import com.hebertnunes.cursomc.domain.Cliente;
 import com.hebertnunes.cursomc.dto.CategoriaDTO;
 import com.hebertnunes.cursomc.repositories.CategoriaRepository;
 import com.hebertnunes.cursomc.services.exceptions.DataIntegrityException;
@@ -39,8 +40,9 @@ public class CategoriaService {
 	
 	public Categoria update(Categoria obj) {
 		
-		find(obj.getId());
-		return categoriaRepository.save(obj);
+		Categoria newObj = find(obj.getId());
+		updateData(obj, newObj);
+		return categoriaRepository.save(newObj);
 	}
 	
 	public void delete(Integer id) {
@@ -68,5 +70,9 @@ public class CategoriaService {
 	
 	public Categoria fromDTO(CategoriaDTO objDto) {
 		return new Categoria(objDto.getId(), objDto.getNome());
+	}
+	
+	private void updateData(Categoria obj, Categoria newObj) {
+		newObj.setNome(obj.getNome());
 	}
 }
