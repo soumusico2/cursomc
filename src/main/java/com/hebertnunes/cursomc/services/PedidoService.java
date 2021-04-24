@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.hebertnunes.cursomc.domain.Cliente;
 import com.hebertnunes.cursomc.domain.ItemPedido;
 import com.hebertnunes.cursomc.domain.PagamentoComBoleto;
 import com.hebertnunes.cursomc.domain.Pedido;
 import com.hebertnunes.cursomc.domain.enums.EstadoPagamento;
+import com.hebertnunes.cursomc.repositories.ClienteRepository;
 import com.hebertnunes.cursomc.repositories.ItemPedidoRepository;
 import com.hebertnunes.cursomc.repositories.PagamentoRepository;
 import com.hebertnunes.cursomc.repositories.PedidoRepository;
@@ -35,6 +37,14 @@ public class PedidoService {
 	@Autowired
 	private ItemPedidoRepository itemPedidoRepository;
 	
+	@Autowired
+	private ClienteRepository clienteRepository;
+	
+	@Autowired
+	private EmailService emailService;
+	
+	
+	
 	public Pedido find(Integer id) throws ObjectNotFoundException {
 		
 		Optional <Pedido> pedido = pedidoRepository.findById(id);
@@ -48,6 +58,7 @@ public class PedidoService {
 		
 		obj.setId(null);
 		obj.setInstante(new Date());
+		obj.setCliente(clienteRepository.findById(obj.getCliente().getId()).orElse(null));
 		obj.getPagamento().setEstado(EstadoPagamento.PENDENTE);
 		obj.getPagamento().setPedido(obj);
 		if(obj.getPagamento() instanceof PagamentoComBoleto) {
@@ -64,6 +75,7 @@ public class PedidoService {
 			ip.setPedido(obj);
 		}
 		itemPedidoRepository.saveAll(obj.getItens());
+		emailService.sendOrderConfirmationEmail(obj);
 		return obj;
 	}
 }
